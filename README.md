@@ -1,5 +1,10 @@
 # bit-test
 
+## Branches
+1. master - empty Vue
+2. moralis - Vue + Moralis
+3. js - vanilla JS
+
 ## Project setup
 ```
 npm install
