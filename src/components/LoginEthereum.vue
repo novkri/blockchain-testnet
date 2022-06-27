@@ -19,7 +19,17 @@ if (typeof window.ethereum !== 'undefined') {
      const account = accounts[0]
      console.log(account, accounts)
 
+
+     // latest, earliest, pending
+     const balance = await window.ethereum.request({ method: 'eth_getBalance', params: [account, 'pending']})
+     console.log(balance)
+     const EthBal = balance * Math.pow(10,(-18));
+     console.log("Eth balance = " + EthBal);
+
+     // todo several accounts
  }
+
+// const loadBalance = () => {}
 
 
 </script>
