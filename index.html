@@ -6,17 +6,24 @@
 </head>
 <body>
     <button id="loginButton">Login</button>
+    <br />
+    <span>User Wallet:</span>
     <p id="userWallet"></p>
+    <br />
+    <span>User Balance: </span>
+    <p id="balance"></p>
 <script>
     window.userWalletAddress = null
+
     const loginButton = document.getElementById('loginButton')
     const userWallet = document.getElementById('userWallet')
+    const userBalance = document.getElementById('userBalance')
 
     function toggleButton() {
         if (!window.ethereum) {
             loginButton.innerText = 'MetaMask is not installed'
-            loginButton.classList.remove('bg-purple-500', 'text-white')
-            loginButton.classList.add('bg-gray-500', 'text-gray-100', 'cursor-not-allowed')
+            // loginButton.classList.remove('bg-purple-500', 'text-white')
+            // loginButton.classList.add('bg-gray-500', 'text-gray-100', 'cursor-not-allowed')
             return false
         }
 
@@ -31,9 +38,18 @@
             })
         if (!accounts) { return }
 
+        // ? todo
+        // HEX String - an integer block number
+        // String "earliest" for the earliest/genesis block
+        // String "latest" - for the latest mined block
+        // String "pending" - for the pending state/transactions
+        //
+        const balance = await window.ethereum.request({ method: 'eth_getBalance', params: [accounts[0]]})
+        const EthBal = balance * Math.pow(10,(-18));
 
         window.userWalletAddress = accounts[0]
         userWallet.innerText = window.userWalletAddress
+        userBalance.innerText = EthBal + 'ETH'
         loginButton.innerText = 'Sign out of MetaMask'
 
         loginButton.removeEventListener('click', loginWithMetaMask)
@@ -45,6 +61,7 @@
     function signOutOfMetaMask() {
         window.userWalletAddress = null
         userWallet.innerText = ''
+        userBalance.innerText = ''
         loginButton.innerText = 'Sign in with MetaMask'
 
         loginButton.removeEventListener('click', signOutOfMetaMask)
