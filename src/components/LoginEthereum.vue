@@ -24,9 +24,7 @@ if (typeof window.ethereum !== 'undefined') {
      const balance = await window.ethereum.request({ method: 'eth_getBalance', params: [account, 'pending']})
      console.log(balance)
      const EthBal = balance * Math.pow(10,(-18));
-     console.log("Eth balance = " + EthBal);
-
-     // todo several accounts
+     console.log("Eth balance = " + EthBal + 'ETH');
  }
 
 // const loadBalance = () => {}
