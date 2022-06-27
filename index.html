@@ -3,76 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <title>Metamask Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <button id="loginButton">Login</button>
-    <br />
-    <span>User Wallet:</span>
-    <p id="userWallet"></p>
-    <br />
-    <span>User Balance: </span>
-    <p id="balance"></p>
-<script>
-    window.userWalletAddress = null
+    <div class="flex flex-col m-auto p-8 justify-center items-center">
+        <button id="loginButton" type="button" class="
+            py-2 px-4 mb-4 bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 focus:ring-offset-indigo-200 text-white
+            w-fit transition ease-in duration-200 text-center text-base font-semibold shadow-md focus:outline-none focus:ring-2
+            focus:ring-offset-2 rounded-lg">Login</button>
+        <br />
+        <div class="grid grid-cols-2 grid-rows-1 gap-x-4 mt-6">
+            <span class="hidden text-center text-lg font-medium text-gray-800" id="label-wallet">User Wallet:</span>
+            <span class="hidden text-center text-lg font-medium text-gray-800" id="label-balance">User Balance: </span>
+            <p id="userWallet" class="hidden"></p>
+            <p id="userBalance" class="hidden"></p>
+        </div>
 
-    const loginButton = document.getElementById('loginButton')
-    const userWallet = document.getElementById('userWallet')
-    const userBalance = document.getElementById('userBalance')
+    </div>
 
-    function toggleButton() {
-        if (!window.ethereum) {
-            loginButton.innerText = 'MetaMask is not installed'
-            // loginButton.classList.remove('bg-purple-500', 'text-white')
-            // loginButton.classList.add('bg-gray-500', 'text-gray-100', 'cursor-not-allowed')
-            return false
+    <script>
+        window.userWalletAddress = null
+
+        const loginButton = document.getElementById('loginButton')
+        const userWallet = document.getElementById('userWallet')
+        const userBalance = document.getElementById('userBalance')
+
+        function disableButtonStyles() {
+            loginButton.classList.remove('bg-purple-500', 'text-white',
+                'hover:bg-indigo-700', 'focus:ring-indigo-500', 'focus:ring-offset-indigo-200',
+                'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2')
+            loginButton.classList.add('bg-gray-500', 'text-gray-100', 'cursor-not-allowed')
         }
 
-        loginButton.addEventListener('click', loginWithMetaMask)
-    }
+        function visibleWalletStyles() {
+            userWallet.classList.remove('hidden')
+            userWallet.classList.add('visible', 'mb-3', 'p-8', 'bg-green-500', 'text-white', 'transition', 'ease-in',
+                'duration-200', 'text-center', 'rounded-md')
+        }
 
-    async function loginWithMetaMask() {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
-            .catch((e) => {
-                console.error(e.message)
-                return
-            })
-        if (!accounts) { return }
+        function visibleBalanceStyles() {
+            userBalance.classList.remove('hidden')
+            userBalance.classList.add('visible', 'mb-3', 'p-8', 'bg-sky-500', 'text-white', 'transition', 'ease-in',
+                'duration-200', 'text-center', 'rounded-md')
+        }
 
-        // ? todo
-        // HEX String - an integer block number
-        // String "earliest" for the earliest/genesis block
-        // String "latest" - for the latest mined block
-        // String "pending" - for the pending state/transactions
-        //
-        const balance = await window.ethereum.request({ method: 'eth_getBalance', params: [accounts[0]]})
-        const EthBal = balance * Math.pow(10,(-18));
+        function visibleLabels() {
+            document.getElementById('label-wallet').classList.remove('hidden')
+            document.getElementById('label-balance').classList.remove('hidden')
 
-        window.userWalletAddress = accounts[0]
-        userWallet.innerText = window.userWalletAddress
-        userBalance.innerText = EthBal + 'ETH'
-        loginButton.innerText = 'Sign out of MetaMask'
+            document.getElementById('label-wallet').classList.add('mb-2')
+            document.getElementById('label-balance').classList.add('mb-2')
+        }
 
-        loginButton.removeEventListener('click', loginWithMetaMask)
-        setTimeout(() => {
-            loginButton.addEventListener('click', signOutOfMetaMask)
-        }, 200)
-    }
+        function toggleButton() {
+            if (!window.ethereum) {
+                loginButton.innerText = 'MetaMask is not installed'
+                disableButtonStyles()
+                return false
+            }
 
-    function signOutOfMetaMask() {
-        window.userWalletAddress = null
-        userWallet.innerText = ''
-        userBalance.innerText = ''
-        loginButton.innerText = 'Sign in with MetaMask'
-
-        loginButton.removeEventListener('click', signOutOfMetaMask)
-        setTimeout(() => {
             loginButton.addEventListener('click', loginWithMetaMask)
-        }, 200)
-    }
+        }
 
-    window.addEventListener('DOMContentLoaded', () => {
-        toggleButton()
-    });
-</script>
+        async function loginWithMetaMask() {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+                .catch((e) => {
+                    console.error(e.message)
+                    return
+                })
+            if (!accounts) { return }
+
+            const balance = await window.ethereum.request({ method: 'eth_getBalance', params: [accounts[0], 'pending']})
+            const EthBal = balance * Math.pow(10,(-18));
+
+            visibleLabels()
+
+            window.userWalletAddress = accounts[0]
+            userWallet.innerText = window.userWalletAddress
+            visibleWalletStyles()
+
+            userBalance.innerText = EthBal + 'ETH'
+            visibleBalanceStyles()
+
+            loginButton.innerText = 'Sign out of MetaMask'
+
+            loginButton.removeEventListener('click', loginWithMetaMask)
+            setTimeout(() => {
+                loginButton.addEventListener('click', signOutOfMetaMask)
+            }, 200)
+        }
+
+        function signOutOfMetaMask() {
+            window.userWalletAddress = null
+            userWallet.innerText = ''
+            userBalance.innerText = ''
+            loginButton.innerText = 'Sign in with MetaMask'
+
+            loginButton.removeEventListener('click', signOutOfMetaMask)
+            setTimeout(() => {
+                loginButton.addEventListener('click', loginWithMetaMask)
+            }, 200)
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            toggleButton()
+        });
+    </script>
 </body>
 </html>
