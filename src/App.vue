@@ -1,13 +1,14 @@
 <template>
   <div>
-
-      <HelloWorld />
-
+    <HelloWorld />
+    <br />
+    <LoginEthereum />
   </div>
 </template>
 
 <script setup>
 import HelloWorld from '@/components/HelloWorld'
+import LoginEthereum from "@/components/LoginEthereum";
 </script>
 
 <style>
