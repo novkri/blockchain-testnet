@@ -55,11 +55,37 @@ await provider.send("eth_requestAccounts", []);
 // send ether and pay to change state within the blockchain.
 // For this, you need the account signer...
 const signer = provider.getSigner()
-
-console.log(1)
 console.log(signer)
 
+console.log(provider)
+// Look up the current block number
+const blockNumber = await provider.getBlockNumber()
+console.log(blockNumber)
 
+const address = signer.getAddress()
+console.log(address)
+
+
+// Get the balance of an account (by address or ENS name, if supported by network)
+const balance = await provider.getBalance(address)
+console.log(balance)
+
+// Often you need to format the output to something more user-friendly,
+// such as in ether (instead of wei)
+const formattedBalance = ethers.utils.formatEther(balance)
+// '0.182826475815887608'
+console.log(formattedBalance)
+
+// If a user enters a string in an input field, you may need
+// to convert it from ether (as a string) to wei (as a BigNumber)
+ethers.utils.parseEther("1.0")
+
+signer.getChainId()
+signer.getFeeData()
+signer.getGasPrice()
+// Returns the number of transactions this account has ever sent. This is the value required to be included in transactions as the nonce.
+const trnsCount = await signer.getTransactionCount()
+console.log(trnsCount)
 
 
 const userAddress = ref('')
