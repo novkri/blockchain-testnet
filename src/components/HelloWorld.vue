@@ -30,6 +30,8 @@
           <ListCard :item="item" />
         </InfoCard>
 
+        <InfoCard title="Balance" :data="balance" bg-color="bg-indigo-500" />
+
         <!--      <span>User Wallet:</span>-->
         <!--      <span>User Balance:</span>-->
         <!--      <br />-->
@@ -57,6 +59,7 @@ const userAddress = ref('')
 // const userBalance = ref('')
 const userName = ref('')
 const userAuthData = ref()
+const balance = ref()
 
 const toTransactions = ref()
 const fromTransactions = ref()
@@ -110,16 +113,19 @@ const getUserInfo = async() => {
   //   address: userAddress.value,
   //   to_block: 0
   // };
-  const balance = await Moralis.Web3API.account.getNativeBalance();
-  console.log('balance', balance)
+  // const balance = await Moralis.Web3API.account.getNativeBalance();
+  // balance.value = await Moralis.Web3API.account.getNativeBalance();
+  // console.log('balance', balance)
 
-  // const options2 = {
-  //   chain: "0x4",
-  //   address: userAddress.value,
-  //   to_block: 0
-  // };
-  const balances = await Moralis.Web3API.account.getTokenBalances();
-  console.log('balances', balances)
+  const options2 = {
+    chain: "binance smart chain testnet", // todo 0x61 = Binance Smart Chain TEstnet
+    // todo define user chain
+    address: userAddress.value
+
+  };
+  // const balances = await Moralis.Web3API.account.getTokenBalances();
+  balance.value = await Moralis.Web3API.account.getTokenBalances(options2);
+  // console.log('balances', balances)
 
 
   toTransactions.value = await findTransactions('to_address')
@@ -140,9 +146,10 @@ const findTransactions = async (queryOperator) => {
 const login = async () => {
 
   if (!currentUser.value) {
-    currentUser.value  = await Moralis.Web3.authenticate({signingMessage:"My custom message"})
+    currentUser.value  = await Moralis.authenticate({signingMessage:"My custom message"})
   }
 
+  console.log(currentUser.value)
   await getUserInfo()
 }
 
