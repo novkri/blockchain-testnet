@@ -43,6 +43,25 @@
 import {onMounted, ref, reactive} from "vue";
 import CommonNetworks from "@/assets/commonNetworks";
 
+
+// https://docs.ethers.io/v5/single-page/#/v5/getting-started/
+import { ethers } from "ethers";
+const provider = new ethers.providers.Web3Provider(window.ethereum)
+
+// MetaMask requires requesting permission to connect users accounts
+await provider.send("eth_requestAccounts", []);
+
+// The MetaMask plugin also allows signing transactions to
+// send ether and pay to change state within the blockchain.
+// For this, you need the account signer...
+const signer = provider.getSigner()
+
+console.log(1)
+console.log(signer)
+
+
+
+
 const userAddress = ref('')
 const userBalance = ref('')
 const currentNetwork = reactive({

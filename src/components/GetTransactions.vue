@@ -137,7 +137,9 @@
 </template>
 
 <script setup>
-import {computed, ref} from "vue";
+import {ref} from "vue";
+
+
 
 const chain = ref("bsc testnet")
 const address = ref()
