@@ -2,7 +2,7 @@
 
 ## Branches
 1. master - empty Vue
-2. moralis - Vue + Moralis
+2. moralis - Vue + Moralis (cannot get User Balance since testnets (Ropsten, Rinkeby and Kovan) are no longer supported starting June 2022)
 3. js - vanilla JS
 
 ## Project setup
