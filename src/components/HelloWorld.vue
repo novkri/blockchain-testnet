@@ -9,6 +9,9 @@
       </button>
     </div>
 
+    <!--    todo tabs -->
+    <!--    https://tailwind-elements.com/docs/standard/navigation/tabs/-->
+    <!--    https://flowbite.com/docs/components/tabs/-->
     <hr />
     <br />
     <div class="box-section">
@@ -29,8 +32,6 @@
           <div class="min-w-max label w-1/5">Network:</div>
           <div class="subtitle2">{{ currentNetwork.name }}</div>
         </div>
-
-
 
       </div>
     </div>

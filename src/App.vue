@@ -2,6 +2,7 @@
   <div>
     <Suspense>
       <HelloWorld />
+
     </Suspense>
   </div>
 </template>
@@ -20,5 +21,10 @@ import HelloWorld from '@/components/HelloWorld'
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  text-align: start;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 </style>
