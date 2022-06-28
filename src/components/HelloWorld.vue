@@ -1,182 +1,123 @@
 <template>
-  <div class="mx-16">
-    <button v-if="!isLoggedIn" class="px-4 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform
-        bg-blue-600 rounded-md hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80"
-        @click="login">
-      Login with Metamask
-    </button>
-    <div v-else>
-      <button v-if="isLoggedIn" class="px-4 py-2 font-medium tracking-wide text-white capitalize transition-colors duration-200 transform
-        bg-blue-600 rounded-md hover:bg-blue-500 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-80"
-              @click="logout">
+  <div>
+    <div class="nav px-8 py-8 flex justify-end">
+      <button class="text-white bg-red-500 px-8 py-2 rounded-full border-none text-2xl" @click="login" v-if="!isLoggedIn">
+        Login with Metamask
+      </button>
+      <button class="text-red-500 px-8 py-2 rounded-full border border-red-500 text-2xl" @click="logout" v-else>
         Logout
       </button>
-
-      <div>
-        <label for="username">Change Username</label>
-        <input id="username" v-model="newUsername" @keyup.enter="changeUsername" />
-      </div>
-
-
-      <div class="grid grid-cols-1 gap-8 mt-8 xl:mt-12 xl:gap-16 md:grid-cols-2 xl:grid-cols-3" v-if="isLoggedIn">
-        <InfoCard title="User Address" :data="userAddress" />
-        <InfoCard title="UserName" :data="userName" bg-color="bg-lime-500" />
-
-        <InfoCard :title="`Incoming Transaction № ${idx + 1}`"  bg-color="bg-orange-500"
-                  v-for="(item, idx) in toTransactions" :key="item.id" :is-slot="true">
-          <ListCard :item="item" />
-        </InfoCard>
-        <InfoCard :title="`Outgoing Transaction № ${idx + 1}`" :data="item" bg-color="bg-red-500"  v-for="(item, idx) in fromTransactions" :key="item.id" :is-slot="true">
-          <ListCard :item="item" />
-        </InfoCard>
-
-        <!--      <span>User Wallet:</span>-->
-        <!--      <span>User Balance:</span>-->
-        <!--      <br />-->
-
-      </div>
-
-
     </div>
 
+    <hr />
+    <br />
+    <div class="box-section">
+      <div class="subtitle1 mb-8">Wallet Info</div>
+      <div class="pl-8">
+        <div class="flex items-center mb-4">
+          <div class="min-w-max label w-1/5">Address:</div>
+          <div class="subtitle2">{{ userAddress }}</div>
+        </div>
+
+        <div class="flex items-center mb-4">
+          <div class="min-w-max label w-1/5">Balance:</div>
+          <div class="subtitle2">{{ userBalance }} {{currentNetwork.currency}}</div>
+        </div>
+
+
+        <div class="flex items-center mb-4">
+          <div class="min-w-max label w-1/5">Network:</div>
+          <div class="subtitle2">{{ currentNetwork.name }}</div>
+        </div>
+
+
+
+      </div>
+    </div>
   </div>
+
 </template>
 
 <script setup>
-import {onMounted, ref} from "vue";
-import Moralis from "moralis";
-import InfoCard from "@/components/InfoCard";
-import ListCard from "@/components/ListCard";
-
-onMounted(() => {
-  Moralis.initialize('k6Yw8DJsnI8k2habAxoQol1ysADfmrr5vF7iH8gi')
-  Moralis.serverURL = "https://njqekmp4bmox.usemoralis.com:2053/server"
-})
+import {onMounted, ref, reactive} from "vue";
+import CommonNetworks from "@/assets/commonNetworks";
 
 const userAddress = ref('')
-// const userBalance = ref('')
-const userName = ref('')
-const userAuthData = ref()
-
-const toTransactions = ref()
-const fromTransactions = ref()
-
+const userBalance = ref('')
+const currentNetwork = reactive({
+  name: '',
+  currency: ''
+})
 const isLoggedIn = ref(false)
-const currentUser = ref()
-
-const newUsername = ref('')
-
-const serverUrl = "https://njqekmp4bmox.usemoralis.com:2053/server";
-const appId = "k6Yw8DJsnI8k2habAxoQol1ysADfmrr5vF7iH8gi";
 
 onMounted(() => {
-  Moralis.start({serverUrl, appId})
-  currentUser.value = Moralis.User.current()
-
-  console.log(currentUser.value)
-  if (currentUser.value) {
-    getUserInfo()
+  if (!window.ethereum) {
+    alert('MetaMask is not installed')
   }
 })
 
-const getEthAddress = () => {
-  userAddress.value = currentUser.value.get('ethAddress')
-}
-
-// const getAuthData = () => {
-//   userAuthData.value = currentUser.value.get('authData')
-// }
-
-const getUsername = () => {
-  userName.value = currentUser.value.get('username')
-}
-
-
-
-const getUserInfo = async() => {
-  isLoggedIn.value = true
-
-  getEthAddress()
-  getUsername()
-
-
-  console.log( Moralis.Web3API.account)
-  const transactions = await Moralis.Web3API.account.getTransactions();
-  console.log('transactions', transactions)
-
-
-  // const options = {
-  //   chain: "eth",
-  //   address: userAddress.value,
-  //   to_block: 0
-  // };
-  const balance = await Moralis.Web3API.account.getNativeBalance();
-  console.log('balance', balance)
-
-  // const options2 = {
-  //   chain: "0x4",
-  //   address: userAddress.value,
-  //   to_block: 0
-  // };
-  const balances = await Moralis.Web3API.account.getTokenBalances();
-  console.log('balances', balances)
-
-
-  toTransactions.value = await findTransactions('to_address')
-  fromTransactions.value = await findTransactions('from_address')
-
-  listenToUpdates()
-}
-
-const findTransactions = async (queryOperator) => {
-  const query = new Moralis.Query("EthTransactions");
-
-  query.equalTo(queryOperator, userAddress.value);
-  const results = await query.find();
-  console.log(results)
-  return results
-}
 
 const login = async () => {
+  isLoggedIn.value = true
+  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
 
-  if (!currentUser.value) {
-    currentUser.value  = await Moralis.Web3.authenticate({signingMessage:"My custom message"})
-  }
+  userAddress.value = accounts[0]
 
-  await getUserInfo()
+
+  const balance = await window.ethereum.request({ method: 'eth_getBalance', params: [accounts[0], 'pending']})
+  const EthBal = balance * Math.pow(10,(-18));
+
+  userBalance.value = EthBal
+
+
+  const chainId = window.ethereum.networkVersion
+  currentNetwork.name = CommonNetworks[chainId].name
+  currentNetwork.currency = CommonNetworks[chainId].currency
+
+
 }
 
-const logout = async () => {
-  await Moralis.User.logOut()
+
+const logout = () => {
   isLoggedIn.value = false
 
-  userName.value = ''
+  userBalance.value = ''
   userAddress.value = ''
-  userAuthData.value = null
-  currentUser.value = Moralis.User.current()
-
-  console.log('logged out')
 }
 
-const changeUsername = () => {
-  console.log(newUsername.value)
-  Moralis.User.setUsername(newUsername.value)
-}
-
-// todo
-const listenToUpdates = async () => {
-  let query = new Moralis.Query('EthTransactions')
-  let subscription = await query.subscribe()
-
-  subscription.on('create', obj => {
-    console.log('New transaction!')
-    console.log(obj)
-  })
-}
 </script>
 
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
 
+.box-section {
+  padding: 32px 24px;
+  background: #fff;
+  box-shadow: 0px 4px 8px rgb(0 0 0 / 4%), 0px 0px 2px rgb(0 0 0 / 6%), 0px 0px 1px rgb(0 0 0 / 4%);
+  border-radius: 4px;
+}
+
+.subtitle1 {
+  color: #222222;
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 32px;
+  letter-spacing: 0.15px;
+}
+
+.subtitle2 {
+  color: #222222;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+  letter-spacing: 0.15px;
+}
+
+.label {
+  color: #767676;
+  font-size: 14px;
+  font-weight: normal;
+  line-height: 26px;
+  letter-spacing: 0.25px;
+}
 </style>
