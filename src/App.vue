@@ -1,17 +1,18 @@
 <template>
   <div>
+
     <HelloWorld />
-    <br />
-    <LoginEthereum />
+
   </div>
 </template>
 
 <script setup>
 import HelloWorld from '@/components/HelloWorld'
-import LoginEthereum from "@/components/LoginEthereum";
+
 </script>
 
 <style>
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
