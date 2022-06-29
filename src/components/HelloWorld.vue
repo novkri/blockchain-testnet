@@ -9,12 +9,11 @@
       </button>
     </div>
 
-    <!--    todo tabs -->
-    <!--    https://tailwind-elements.com/docs/standard/navigation/tabs/-->
-    <!--    https://flowbite.com/docs/components/tabs/-->
+
     <hr />
     <br />
-    <div class="box-section">
+    <TabsComponent :items="['Wallet', 'Transactions', 'Info']" @select-tab="tab => activeTab = tab" :active-tab="activeTab" />
+    <div class="box-section" v-if="activeTab === 'Wallet'">
       <div class="subtitle1 mb-8">Wallet Info</div>
       <div class="pl-8">
         <div class="flex items-center mb-4">
@@ -35,6 +34,10 @@
 
       </div>
     </div>
+
+    <div class="box-section" v-if="activeTab === 'Transactions'">
+      <div class="subtitle1 mb-8">Transactions Info</div>
+    </div>
   </div>
 
 </template>
@@ -45,6 +48,9 @@ import CommonNetworks from "@/assets/commonNetworks";
 import { ethers } from "ethers";
 import {useBalance} from "@/composables/useBalance";
 // import {useConnect} from "@/composables/useConnect";
+import TabsComponent from '@/components/TabsComponent'
+
+const activeTab = ref('Wallet')
 
 const userAddress = ref('')
 const userBalance = ref('')
