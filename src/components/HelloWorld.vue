@@ -42,51 +42,9 @@
 <script setup>
 import {onMounted, ref, reactive} from "vue";
 import CommonNetworks from "@/assets/commonNetworks";
-
-
-// https://docs.ethers.io/v5/single-page/#/v5/getting-started/
 import { ethers } from "ethers";
-const provider = new ethers.providers.Web3Provider(window.ethereum)
-
-// MetaMask requires requesting permission to connect users accounts
-await provider.send("eth_requestAccounts", []);
-
-// The MetaMask plugin also allows signing transactions to
-// send ether and pay to change state within the blockchain.
-// For this, you need the account signer...
-const signer = provider.getSigner()
-console.log(signer)
-
-console.log(provider)
-// Look up the current block number
-const blockNumber = await provider.getBlockNumber()
-console.log(blockNumber)
-
-const address = signer.getAddress()
-console.log(address)
-
-
-// Get the balance of an account (by address or ENS name, if supported by network)
-const balance = await provider.getBalance(address)
-console.log(balance)
-
-// Often you need to format the output to something more user-friendly,
-// such as in ether (instead of wei)
-const formattedBalance = ethers.utils.formatEther(balance)
-// '0.182826475815887608'
-console.log(formattedBalance)
-
-// If a user enters a string in an input field, you may need
-// to convert it from ether (as a string) to wei (as a BigNumber)
-ethers.utils.parseEther("1.0")
-
-signer.getChainId()
-signer.getFeeData()
-signer.getGasPrice()
-// Returns the number of transactions this account has ever sent. This is the value required to be included in transactions as the nonce.
-const trnsCount = await signer.getTransactionCount()
-console.log(trnsCount)
-
+import {useBalance} from "@/composables/useBalance";
+// import {useConnect} from "@/composables/useConnect";
 
 const userAddress = ref('')
 const userBalance = ref('')
@@ -95,6 +53,19 @@ const currentNetwork = reactive({
   currency: ''
 })
 const isLoggedIn = ref(false)
+
+const provider = new ethers.providers.Web3Provider(window.ethereum)
+const signer = provider.getSigner()
+
+provider.on("network", (newNetwork, oldNetwork) => {
+  // When a Provider makes its initial connection, it emits a "network"
+  // event with a null oldNetwork along with the newNetwork. So, if the
+  // oldNetwork exists, it represents a changing network
+  console.log(newNetwork, oldNetwork)
+  if (oldNetwork) {
+    window.location.reload();
+  }
+});
 
 onMounted(() => {
   if (!window.ethereum) {
@@ -105,22 +76,40 @@ onMounted(() => {
 
 const login = async () => {
   isLoggedIn.value = true
-  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
 
-  userAddress.value = accounts[0]
-
-
-  const balance = await window.ethereum.request({ method: 'eth_getBalance', params: [accounts[0], 'pending']})
-  const EthBal = balance * Math.pow(10,(-18));
-
-  userBalance.value = EthBal
+  // const accounts = await provider.send("eth_requestAccounts", []);
+  const address = await signer.getAddress()
+  userAddress.value = address
 
 
-  const chainId = window.ethereum.networkVersion
-  currentNetwork.name = CommonNetworks[chainId].name
-  currentNetwork.currency = CommonNetworks[chainId].currency
+  const { getBalance } = useBalance(address, provider)
+  userBalance.value  =  (await getBalance()).value
+  // const balance = await provider.getBalance(address)
+  // userBalance.value = ethers.utils.formatEther(balance)
+
+  // const chainId = window.ethereum.networkVersion
+  const chainIdd = await signer.getChainId()
+
+  currentNetwork.name = CommonNetworks[chainIdd].name
+  currentNetwork.currency = CommonNetworks[chainIdd].currency
 
 
+
+  // Look up the current block number
+  // const blockNumber = await provider.getBlockNumber()
+  // console.log('current block number', blockNumber)
+
+
+  // const feeData = await signer.getFeeData()
+  // const gasPrice = await signer.getGasPrice()
+
+  // Returns the number of transactions this account has ever sent.
+  // const trnsCount = await signer.getTransactionCount()
+  // console.log(trnsCount)
+
+
+  // const {account, chainId, data, connect, switchChain}  = useConnect()
+  // console.log(account, chainId, data, connect, switchChain)
 }
 
 
